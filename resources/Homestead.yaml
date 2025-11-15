@@ -1,47 +1,69 @@
 ---
-ip: "192.168.56.56"
-memory: 2048
+ip: "192.168.56.158"
+memory: 4096
 cpus: 2
-provider: virtualbox
+#provider: hyperv
 
 authorize: ~/.ssh/id_rsa.pub
 
 keys:
-  - ~/.ssh/id_rsa
+    - ~/.ssh/id_rsa
 
-folders:
-  - map: ~/code
-    to: /home/vagrant/code
+name: "pystead"
+hostname: "pystead"
+box: "laravel/homestead"
+
+
+#folders:
+#    - map: D:\Projects\demo\osis
+#      to: /home/vagrant/www/farmstead/osis
+#      type: "smb"
+#      smb_username: dimag
+#      smb_password: zG21mWB5gd3c
 
 sites:
-  - map: homestead.test
-    to: /home/vagrant/code/public
+    - map: pystead.dev
+      to: /home/vagrant/www/pystead
+#      php: "7.4"
+#    - map: developer.archive.eadsc.ru
+#      to: /home/vagrant/www/trarchivecloudfront
 
 databases:
-  - homestead
+    - terminal
 
 features:
-  - mariadb: false
-  - postgresql: false
-  - ohmyzsh: false
-  - webdriver: false
+    - uv:
+        version: "latest"
+        python_version: "3.11.9"
+    - poetry: true
+    - mc-htop: true
+    - postgresql: true
+    - mysql: false
+    - mongodb: false
+    - couchdb: false
+    - influxdb: false
+    - mariadb: false
+    - ohmyzsh: false
+    - webdriver: false
 
 services:
-  - enabled:
-      - "mysql"
-#   - disabled:
-#       - "postgresql@11-main"
+    - enabled:
+        - "postgresql@15-main"
+    - disabled:
+        - "mysql"
 
-# ports:
-#   - send: 33060 # MySQL/MariaDB
-#     to: 3306
-#   - send: 4040
-#     to: 4040
-#   - send: 54320 # PostgreSQL
-#     to: 5432
-#   - send: 8025 # Mailpit
-#     to: 8025
-#   - send: 9600
-#     to: 9600
-#   - send: 27017
-#     to: 27017
+ports:
+#    - send: 33060 # MySQL/MariaDB
+#      to: 3306
+#    - send: 4040
+#      to: 4040
+    - send: 54320 # PostgreSQL
+      to: 5432
+#    - send: 8025 # Mailhog
+#      to: 8025
+#    - send: 9600
+#      to: 9600
+#    - send: 27017
+#      to: 27017
+#    - send: 9000 # xdebug
+#      to: 9001
