@@ -23,7 +23,7 @@ PyStead - это форк Laravel Homestead, адаптированный для
 
 ### Основные отличия от Laravel Homestead
 
-#### Удалено (PHP-специфичное):
+#### Удалено (специфично для PHP):
 
 - PHP CLI управление версиями
 - PHP-FPM конфигурация
@@ -31,15 +31,14 @@ PyStead - это форк Laravel Homestead, адаптированный для
 - XHGui профилировщик
 - PHP параметры в конфигурации сайтов
 
-#### Добавлено (Python-специфичное):
+#### Добавлено (специфично для Python):
 
-- pyenv - управление версиями Python
+- uv - управление версиями Python и быстрая альтернатива pip
 - poetry - современный пакетный менеджер
-- uv - быстрая альтернатива pip
 - ruff - быстрый линтер и форматтер
 - Готовые шаблоны для Django, Flask, FastAPI
 
-#### Сохранено (универсальное):
+#### Сохранено:
 
 - Все VM провайдеры (VirtualBox, VMware, Hyper-V, Parallels, libvirt)
 - Nginx/Apache веб-серверы
@@ -52,7 +51,7 @@ PyStead - это форк Laravel Homestead, адаптированный для
 
 PyStead состоит из двух проектов. Первый - это репозиторий, который представляет собой само приложение Homestead. Приложение представляет собой оболочку для Vagrant, которая является пользователем API гипервизора виртуализации или поставщика, такого как Virtualbox, Hyper-V, VMware или Parallels. Вторая часть Homestead - это *Settler*, который, по сути, представляет собой скрипты на JSON и Bash, позволяющие превратить минималистичную ОС Ubuntu в то, что мы называем *Homestead base box*. Homestead и Settler (он же *Homestead Base / Base Box*) в совокупности дают вам среду разработки Homestead. 
 
-> При первом запуске `vagrant up` up будет загружен базовый образ (~2GB). Он сохранится в `~/.vagrant.d/` и будет использоваться повторно.
+> При первом запуске `vagrant up` будет загружен базовый образ (~2GB). Он сохранится в `~/.vagrant.d/` и будет использоваться повторно.
 
 ##### Текущие версии
 | Ubuntu LTS | Settler Version | Homestead Version | Branch    | Status               |
@@ -109,9 +108,11 @@ databases:
     - myapp
 
 features:
-    - python: true
+    - uv:
+        version: "latest"
+        python_version: "3.11.9"
     - poetry: true
-    - pyenv: true
+    - mc-htop: true
     - postgresql: true
 ```
 5. Добавление хоста
