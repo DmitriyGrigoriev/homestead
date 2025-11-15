@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
-declare -A params=$6       # Create an associative array
-declare -A headers=$9      # Create an associative array
+# PyStead: Updated parameter indices after PHP removal
+# Old: $1=map, $2=to, $3=port, $4=ssl, $5=php, $6=params, $7=xhgui, $8=exec, $9=headers, $10=rewrites, $11=prod
+# New: $1=map, $2=to, $3=port, $4=ssl, $5=params, $6=exec, $7=headers, $8=rewrites, $9=prod
+
+declare -A params=$5       # Create an associative array (was $6)
+declare -A headers=$7      # Create an associative array (was $9)
 paramsTXT=""
-if [ -n "$6" ]; then
+if [ -n "$5" ]; then
    for element in "${!params[@]}"
    do
       paramsTXT="${paramsTXT}
@@ -11,7 +15,7 @@ if [ -n "$6" ]; then
    done
 fi
 headersTXT=""
-if [ -n "$9" ]; then
+if [ -n "$7" ]; then
    for element in "${!headers[@]}"
    do
       headersTXT="${headersTXT}

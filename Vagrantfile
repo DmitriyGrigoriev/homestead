@@ -33,6 +33,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         abort "Homestead settings file not found in #{confDir}"
     end
 
+    config.vm.box_check_update = false
+
     Homestead.configure(config, settings)
 
     if File.exist? afterScriptPath then

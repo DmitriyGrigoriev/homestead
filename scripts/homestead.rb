@@ -220,7 +220,7 @@ class Homestead
 
             smb_creds = {smb_host: folder['smb_host'], smb_username: folder['smb_username'], smb_password: folder['smb_password']}
           end
-          
+
           # For b/w compatibility keep separate 'mount_opts', but merge with options
           options = (folder['options'] || {})
             .merge({ mount_options: mount_opts })
@@ -249,13 +249,7 @@ class Homestead
       config.vm.synced_folder "./", "/vagrant", type: "virtiofs"
     end
 
-    # Change PHP CLI version based on configuration
-    if settings.has_key?('php') && settings['php']
-      config.vm.provision "Changing PHP CLI Version", type: "shell" do |s|
-        s.name = 'Changing PHP CLI Version'
-        s.inline = "sudo update-alternatives --set php /usr/bin/php#{settings['php']}; sudo update-alternatives --set php-config /usr/bin/php-config#{settings['php']}; sudo update-alternatives --set phpize /usr/bin/phpize#{settings['php']}"
-      end
-    end
+    # PHP CLI version configuration removed for PyStead (Python-focused fork)
 
     # Creates folder for opt-in features lockfiles
     config.vm.provision "mk_features", type: "shell", inline: "mkdir -p /home/vagrant/.homestead-features"
@@ -270,16 +264,9 @@ class Homestead
         end
       end
 
-      config.vm.provision "apt_update", type: "shell", inline: "apt-get update"
+      config.vm.provision "apt_update", type: "shell", inline: "apt-get update --allow-releaseinfo-change"
 
-      # Ensure we have PHP versions used in sites in our features
-      if settings.has_key?('sites')
-        settings['sites'].each do |site|
-          if site.has_key?('php')
-            settings['features'].push({"php" + site['php'] => true})
-          end
-        end
-      end
+      # PHP auto-installation from sites removed for PyStead
 
       # Remove duplicate features to prevent trying to install it multiple times
       settings['features'] = settings['features'].uniq{ |e| e.keys[0] }
@@ -416,13 +403,11 @@ class Homestead
               site['to'],                 # $2
               site['port'] ||= http_port, # $3
               site['ssl'] ||= https_port, # $4
-              site['php'] ||= '8.3',      # $5
-              params ||= '',              # $6
-              site['xhgui'] ||= '',       # $7
-              site['exec'] ||= 'false',   # $8
-              headers ||= '',             # $9
-              rewrites ||= '',             # $10
-              site['prod'] ||=''          # $11
+              params ||= '',              # $5 (was $6, PHP removed)
+              site['exec'] ||= 'false',   # $6 (was $8, xhgui removed)
+              headers ||= '',             # $7 (was $9)
+              rewrites ||= '',            # $8 (was $10)
+              site['prod'] ||=''          # $9 (was $11)
           ]
 
           # Should we use the wildcard ssl?
@@ -465,23 +450,7 @@ class Homestead
             end
           end
 
-          if site['xhgui'] == 'true'
-            config.vm.provision 'shell' do |s|
-              s.path = script_dir + '/features/mongodb.sh'
-            end
-
-            config.vm.provision 'shell' do |s|
-              s.path = script_dir + '/install-xhgui.sh'
-            end
-
-            config.vm.provision 'shell' do |s|
-              s.inline = 'ln -sf /opt/xhgui/webroot ' + site['to'] + '/xhgui'
-            end
-          else
-            config.vm.provision 'shell' do |s|
-              s.inline = 'rm -rf ' + site['to'].to_s + '/xhgui'
-            end
-          end
+          # xhgui (PHP profiler) removed for PyStead
 
         end
 
@@ -497,7 +466,7 @@ class Homestead
 
             if site['schedule']
               s.path = script_dir + '/cron-schedule.sh'
-              s.args = [site['map'].tr('^A-Za-z0-9', ''), site['to'], site['php'] ||= '']
+              s.args = [site['map'].tr('^A-Za-z0-9', ''), site['to']]
             else
               s.inline = "rm -f /etc/cron.d/$1"
               s.args = [site['map'].tr('^A-Za-z0-9', '')]
@@ -521,64 +490,14 @@ class Homestead
 
     if settings.has_key?('variables')
       settings['variables'].each do |var|
+        # PHP-FPM configuration removed for PyStead
+        # Only export environment variables to .profile
+
         config.vm.provision 'shell' do |s|
-          s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php/5.6/fpm/pool.d/www.conf"
+          s.inline = "echo \"\n# Set PyStead Environment Variable\nexport $1=$2\" >> /home/vagrant/.profile"
           s.args = [var['key'], var['value']]
         end
 
-        config.vm.provision 'shell' do |s|
-          s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php/7.0/fpm/pool.d/www.conf"
-          s.args = [var['key'], var['value']]
-        end
-
-        config.vm.provision 'shell' do |s|
-          s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php/7.1/fpm/pool.d/www.conf"
-          s.args = [var['key'], var['value']]
-        end
-
-        config.vm.provision 'shell' do |s|
-          s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php/7.2/fpm/pool.d/www.conf"
-          s.args = [var['key'], var['value']]
-        end
-
-        config.vm.provision 'shell' do |s|
-          s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php/7.3/fpm/pool.d/www.conf"
-          s.args = [var['key'], var['value']]
-        end
-
-        config.vm.provision 'shell' do |s|
-          s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php/7.4/fpm/pool.d/www.conf"
-          s.args = [var['key'], var['value']]
-        end
-
-        config.vm.provision 'shell' do |s|
-          s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php/8.0/fpm/pool.d/www.conf"
-          s.args = [var['key'], var['value']]
-        end
-
-        config.vm.provision 'shell' do |s|
-          s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php/8.1/fpm/pool.d/www.conf"
-          s.args = [var['key'], var['value']]
-        end
-
-        config.vm.provision 'shell' do |s|
-          s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php/8.2/fpm/pool.d/www.conf"
-          s.args = [var['key'], var['value']]
-        end
-
-        config.vm.provision 'shell' do |s|
-          s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php/8.3/fpm/pool.d/www.conf"
-          s.args = [var['key'], var['value']]
-        end
-
-        config.vm.provision 'shell' do |s|
-          s.inline = "echo \"\n# Set Homestead Environment Variable\nexport $1=$2\" >> /home/vagrant/.profile"
-          s.args = [var['key'], var['value']]
-        end
-      end
-
-      config.vm.provision 'shell' do |s|
-        s.inline = 'service php5.6-fpm restart;service php7.0-fpm restart;service php7.1-fpm restart; service php7.2-fpm restart; service php7.3-fpm restart; service php7.4-fpm restart; service php8.0-fpm restart; service php8.1-fpm restart; service php8.2-fpm restart; service php8.3-fpm restart;'
       end
     end
 
@@ -630,6 +549,15 @@ class Homestead
             s.path = script_dir + '/create-postgres.sh'
             s.args = [db]
           end
+          config.vm.provision 'shell' do |s|
+            s.name = 'Configure pg_hba.conf: ' + settings['ip']
+            s.path = script_dir + '/pg-hba-conf.sh'
+            if settings['ip'] != 'autonetwork'
+              s.args = settings['ip']
+            else
+              s.args = '0.0.0.0'
+            end
+          end
         end
 
         if enabled_databases.include? 'mongodb'
@@ -670,12 +598,7 @@ class Homestead
       end
     end
 
-    # Update Composer On Every Provision
-    config.vm.provision 'shell' do |s|
-      s.name = 'Update Composer'
-      s.inline = 'sudo chown -R vagrant:vagrant /usr/local/bin && sudo -u vagrant /usr/bin/php8.3 /usr/local/bin/composer self-update --no-progress && sudo chown -R vagrant:vagrant /home/vagrant/.config/'
-      s.privileged = false
-    end
+    # Composer updates removed for PyStead (use pip, poetry, or uv instead)
 
     # Add config file for ngrok
     config.vm.provision 'shell' do |s|
