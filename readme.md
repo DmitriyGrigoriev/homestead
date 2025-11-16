@@ -333,6 +333,11 @@ vagrant status
 # Обновление box (новая версия PyStead)
 vagrant box update
 ```
+## Скачать образ VM для локального использования
+```commandline
+# Скачать virtualbox
+vagrant box add laravel/homestead --provider virtualbox --box-version 14.0.2
+```
 
 ## Проблемы и решения
 
