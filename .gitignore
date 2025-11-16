@@ -1,5 +1,8 @@
 /vendor
 /.vagrant
+/.idea
+/.serena
+/.continue
 phpunit.xml
 /Homestead.yaml
 /Homestead.json

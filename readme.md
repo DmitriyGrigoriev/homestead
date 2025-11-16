@@ -387,10 +387,10 @@ folders:
       smb_password: your_windows_password
 ```
 
-## Полезные ссылки
-[Vagrant Documentation](https://www.vagrantup.com/docs/)
-[Poetry Documentation](https://python-poetry.org/docs/)
-[uv Documentation](https://github.com/astral-sh/uv/)
+### Полезные ссылки
+- [Vagrant Documentation](https://www.vagrantup.com/docs/)
+- [Poetry Documentation](https://python-poetry.org/docs/)
+- [uv Documentation](https://github.com/astral-sh/uv/)
 
-## Благодарности
+### Благодарности
 PyStead основан на Laravel Homestead. Спасибо команде Laravel за отличный инструмент!
